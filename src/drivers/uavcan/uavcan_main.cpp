@@ -82,6 +82,7 @@ UavcanNode::UavcanNode(uavcan::ICanDriver &can_driver, uavcan::ISystemClock &sys
 	_node_mutex(),
 	_esc_controller(_node),
 	_hardpoint_controller(_node),
+    _enord_esc_controller(_node),
 	_time_sync_master(_node),
 	_time_sync_slave(_node),
 	_node_status_monitor(_node),
@@ -101,6 +102,13 @@ UavcanNode::UavcanNode(uavcan::ICanDriver &can_driver, uavcan::ISystemClock &sys
 	for (int i = 0; i < NUM_ACTUATOR_CONTROL_GROUPS_UAVCAN; ++i) {
 		_control_subs[i] = -1;
 	}
+    ///> ENORD ESC
+    _rc_channels_sub = -1;
+    _vehicle_local_position_sub = -1;
+    _enord_command_sub = -1;
+    _vehicle_status_sub = -1;
+    _manual_control_setpoint_sub= -1;
+    ///< ENORD ESC
 
 	int res = pthread_mutex_init(&_node_mutex, nullptr);
 
@@ -146,6 +154,12 @@ UavcanNode::~UavcanNode()
 	(void)orb_unsubscribe(_armed_sub);
 	(void)orb_unsubscribe(_test_motor_sub);
 	(void)orb_unsubscribe(_actuator_direct_sub);
+     ///> ENORD ESC
+    (void)orb_unsubscribe(_rc_channels_sub);
+    (void)orb_unsubscribe(_vehicle_local_position_sub);    
+    (void)orb_unsubscribe(_enord_command_sub);
+    (void)orb_unsubscribe(_vehicle_status_sub);
+    (void)orb_unsubscribe(_manual_control_setpoint_sub);
 
 	// Removing the sensor bridges
 	_sensor_bridges.clear();
@@ -642,6 +656,11 @@ int UavcanNode::init(uavcan::NodeID node_id)
 	if (ret < 0) {
 		return ret;
 	}
+	// Enord ESC
+	ret = _enord_esc_controller.init();
+        if (ret < 0) {
+            return ret;
+        }
 
 	// Sensor bridges
 	IUavcanSensorBridge::make_all(_node, _sensor_bridges);
@@ -748,6 +767,11 @@ int UavcanNode::run()
 	_test_motor_sub = orb_subscribe(ORB_ID(test_motor));
 	_actuator_direct_sub = orb_subscribe(ORB_ID(actuator_direct));
 
+    _rc_channels_sub = orb_subscribe(ORB_ID(rc_channels));
+    _vehicle_local_position_sub = orb_subscribe(ORB_ID(vehicle_local_position));
+    _vehicle_status_sub = orb_subscribe(ORB_ID(vehicle_status));
+    _enord_command_sub = orb_subscribe(ORB_ID(enord_command));
+    _manual_control_setpoint_sub =  orb_subscribe(ORB_ID(manual_control_setpoint));
 	memset(&_outputs, 0, sizeof(_outputs));
 
 	/*
@@ -953,6 +977,54 @@ int UavcanNode::run()
 				}
 			}
 		}
+		///> ENORD ESC
+        struct  rc_channels_s                 _rc_channels;
+        struct  vehicle_local_position_s      pos;
+        struct  enord_command_s               cmds;
+        struct  vehicle_status_s              _status;
+        struct  manual_control_setpoint_s     _mc_sp;
+
+        orb_copy(ORB_ID(rc_channels), _rc_channels_sub, &_rc_channels);
+        orb_copy(ORB_ID(vehicle_local_position), _vehicle_local_position_sub, &pos);
+        orb_copy(ORB_ID(enord_command), _enord_command_sub, &cmds);
+        orb_copy(ORB_ID(vehicle_status), _vehicle_status_sub, &_status);
+        orb_copy(ORB_ID(manual_control_setpoint), _manual_control_setpoint_sub, &_mc_sp);
+
+        _enord_esc_controller._switch_value = EnordEscController::ENORD_ESC_OPERATION_IDLE;
+        _enord_esc_controller._roll_value = 0;
+        _enord_esc_controller._pitch_value = 0;
+
+        int spray_channel = 0;
+
+        (void)param_get(param_find("ENORD_SWITCH"), &spray_channel);
+
+        if(_mc_sp.x > 0.1f || _mc_sp.x < -0.1f)
+        {
+
+            _enord_esc_controller._roll_value = _mc_sp.y;
+            _enord_esc_controller._pitch_value = _mc_sp.x;
+        }else  if(cmds.pump_on_off > 0){
+            _enord_esc_controller._switch_value =  EnordEscController::ENORD_ESC_OPERATION_OPERATION;
+            if(cmds.direction > 0.1f)
+            {
+                _enord_esc_controller._pitch_value = 1;
+            }else{
+                _enord_esc_controller._pitch_value = -1;
+            }
+        }
+
+        float _channel_value = _rc_channels.channels[spray_channel-1];
+        _enord_esc_controller._switch_value = (int)(_channel_value > 0 ? _channel_value+0.5f : _channel_value-0.5f);
+
+        // later gps info test need...
+        double ground_speed = sqrtf(pos.vx * pos.vx + pos.vy * pos.vy);
+
+        float _altitude = 0.0f;
+
+        // check vehicle is arming.
+        _enord_esc_controller._armed = _status.arming_state;
+        _enord_esc_controller.update_outputs(ground_speed, _altitude);
+        ///< ENORD ESC
 
 
 		// Check motor test state

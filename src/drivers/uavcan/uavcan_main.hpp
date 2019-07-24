@@ -61,8 +61,14 @@
 #include <uORB/topics/actuator_armed.h>
 #include <uORB/topics/test_motor.h>
 #include <uORB/topics/actuator_direct.h>
+#include <uORB/topics/rc_channels.h>
+#include <uORB/topics/vehicle_local_position.h>
+#include <uORB/topics/enord_command.h>
+#include <uORB/topics/vehicle_status.h>
+#include <uORB/topics/manual_control_setpoint.h>
 
 #include "actuators/esc.hpp"
+#include "actuators/enord_esc.hpp"
 #include "actuators/hardpoint.hpp"
 #include "sensors/sensor_bridge.hpp"
 
@@ -185,11 +191,19 @@ private:
 	px4_sem_t			_server_command_sem;
 	UavcanEscController		_esc_controller;
 	UavcanHardpointController	_hardpoint_controller;
+	
+    EnordEscController		        _enord_esc_controller;
 	uavcan::GlobalTimeSyncMaster	_time_sync_master;
 	uavcan::GlobalTimeSyncSlave	_time_sync_slave;
 	uavcan::NodeStatusMonitor	_node_status_monitor;
 
 	List<IUavcanSensorBridge *>	_sensor_bridges;		///< List of active sensor bridges
+	///< ENORD ESC
+    int                             _rc_channels_sub;               /**< rc channels data subscription */
+    int                             _vehicle_local_position_sub;   /**< gps control subscription handle */
+    int                             _enord_command_sub;
+    int                             _vehicle_status_sub;
+    int                             _manual_control_setpoint_sub;
 
 	MixerGroup			*_mixers = nullptr;
 	ITxQueueInjector		*_tx_injector;

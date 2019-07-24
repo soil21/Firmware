@@ -69,6 +69,7 @@ px4_add_board(
 		commander
 		dataman
 		ekf2
+                enord_led
 		events
 		fw_att_control
 		fw_pos_control_l1

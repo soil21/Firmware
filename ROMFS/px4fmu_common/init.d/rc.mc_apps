@@ -54,3 +54,6 @@ mc_pos_control start
 # Start Multicopter Land Detector.
 #
 land_detector start multicopter
+
+#Start enord led control
+enord_led start

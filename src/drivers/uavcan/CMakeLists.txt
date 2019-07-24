@@ -88,6 +88,9 @@ px4_add_module(
 		actuators/esc.cpp
 		actuators/hardpoint.cpp
 
+                # AMU
+                actuators/enord_esc.cpp
+
 		# Sensors
 		sensors/sensor_bridge.cpp
 		sensors/gnss.cpp

@@ -55,6 +55,8 @@ set(msg_files
 	ekf2_timestamps.msg
 	ekf_gps_drift.msg
 	ekf_gps_position.msg
+        enord_report.msg
+        enord_command.msg
 	esc_report.msg
 	esc_status.msg
 	estimator_status.msg

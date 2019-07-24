@@ -448,6 +448,7 @@ PARAM_DEFINE_FLOAT(EKF2_MAG_DECL, 0);
  * @unit deg
  * @decimal 1
  */
+
 PARAM_DEFINE_FLOAT(EKF2_MAG_D_CONST, 0);
 
 /**

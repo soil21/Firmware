@@ -137,8 +137,11 @@ __EXPORT void stm32_boardinitialize(void)
 	stm32_gpiowrite(GPIO_SBUS_OENABLE, true);
 	stm32_configgpio(GPIO_SBUS_OENABLE);
 
-	stm32_configgpio(GPIO_PPM1); /* xxx alternate function */
-	stm32_configgpio(GPIO_PPM2); /* xxx alternate function */
+        stm32_configgpio(GPIO_PPM1); /* xxx alternate function */
+        stm32_configgpio(GPIO_PPM2); /* xxx alternate function */
+
+
+
 
 	stm32_gpiowrite(GPIO_PWM1, true);
 	stm32_configgpio(GPIO_PWM1);

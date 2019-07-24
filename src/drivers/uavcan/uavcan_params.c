@@ -55,7 +55,9 @@
  * @reboot_required true
  * @group UAVCAN
  */
-PARAM_DEFINE_INT32(UAVCAN_ENABLE, 0);
+
+PARAM_DEFINE_INT32(UAVCAN_ENABLE, 1);
+
 
 /**
  * UAVCAN Node ID.
@@ -88,3 +90,36 @@ PARAM_DEFINE_INT32(UAVCAN_BITRATE, 1000000);
  * @group UAVCAN
  */
 PARAM_DEFINE_INT32(UAVCAN_ESC_IDLT, 1);
+
+
+// spread quantity on speed
+PARAM_DEFINE_INT32(ENODE_V_USE, 1);     // 0 : False, 1 : True
+
+PARAM_DEFINE_INT32(ENORD_OP_MIN, 10);   // 80
+PARAM_DEFINE_INT32(ENORD_OP_MAX, 80);   // 200
+
+/**
+ * Minimum speed for spray
+ */
+PARAM_DEFINE_FLOAT(ENORD_V_MIN, 0.5f);
+
+
+/**
+ * Max Speed for spray
+ */
+PARAM_DEFINE_FLOAT(ENORD_V_MAX, 5.0f);
+
+/**
+ * RC PITCH CHANNEL
+ */
+PARAM_DEFINE_INT32(ENORD_PITCH, 1);
+
+/**
+ * RC ROLL CHANNEL
+ */
+PARAM_DEFINE_INT32(ENORD_ROLL, 0);
+
+/**
+ * RC SPRAY SWITCH CHANNEL
+ */
+PARAM_DEFINE_INT32(ENORD_SWITCH, 6);
