@@ -1,0 +1,43 @@
+src\lib\ecl\EKF\common.h
+++++++++++++
+LINE 266
+	float mag_declination_deg_constant{0.0f};	///< magnetic declination constant(degrees)
+
+
+src\lib\ecl\EKF\mag_fusion.cpp
+++++++
+LINE 941
+	float decl_const_reference;
+
+++++++
+LINE 944
+	decl_const_reference = math::radians(_params.mag_declination_deg_constant);
+
+---------
+LINE 978
+	const float decl_max = decl_reference + decl_tolerance;
+	const float decl_min = decl_reference - decl_tolerance;
+++++++
+	const float decl_max = decl_const_reference + decl_reference + decl_tolerance;
+	const float decl_min = decl_const_reference + decl_reference - decl_tolerance;
+
+
+src\lib\ecl\EKF\ekf_helper.cpp
+------
+LINE 779
+			return _mag_declination_gps;
+++++++
+			return math::radians(_params.mag_declination_deg_constant)+_mag_declination_gps;
+
+------
+LINE 782
+		return math::radians(_params.mag_declination_deg);
+++++++
+		return math::radians(_params.mag_declination_deg_constant+_params.mag_declination_deg);
+
+----------
+LINE 787
+			return math::radians(_params.mag_declination_deg);
+++++++
+		return math::radians(_params.mag_declination_deg_constant+_params.mag_declination_deg);
+
