@@ -440,6 +440,17 @@ PARAM_DEFINE_FLOAT(EKF2_BETA_NOISE, 0.3f);
 PARAM_DEFINE_FLOAT(EKF2_MAG_DECL, 0);
 
 /**
+ * Magnetic declination constant
+ *
+ * @group EKF2
+ * @volatile
+ * @category system
+ * @unit deg
+ * @decimal 1
+ */
+PARAM_DEFINE_FLOAT(EKF2_MAG_D_CONST, 0);
+
+/**
  * Gate size for magnetic heading fusion
  *
  * Sets the number of standard deviations used by the innovation consistency test.

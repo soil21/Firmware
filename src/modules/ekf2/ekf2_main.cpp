@@ -362,6 +362,7 @@ private:
 		_param_ekf2_beta_gate, ///< synthetic sideslip innovation consistency gate size (STD)
 		(ParamExtFloat<px4::params::EKF2_BETA_NOISE>) _param_ekf2_beta_noise,	///< synthetic sideslip noise (rad)
 		(ParamExtFloat<px4::params::EKF2_MAG_DECL>) _param_ekf2_mag_decl,///< magnetic declination (degrees)
+		(ParamExtFloat<px4::params::EKF2_MAG_D_CONST>) _param_ekf2_mag_decl_const,///< magnetic declination (degrees)
 		(ParamExtFloat<px4::params::EKF2_HDG_GATE>)
 		_param_ekf2_hdg_gate,///< heading fusion innovation consistency gate size (STD)
 		(ParamExtFloat<px4::params::EKF2_MAG_GATE>)
@@ -569,6 +570,7 @@ Ekf2::Ekf2():
 	_param_ekf2_beta_gate(_params->beta_innov_gate),
 	_param_ekf2_beta_noise(_params->beta_noise),
 	_param_ekf2_mag_decl(_params->mag_declination_deg),
+	_param_ekf2_mag_decl_const(_params->mag_declination_deg_constant),
 	_param_ekf2_hdg_gate(_params->heading_innov_gate),
 	_param_ekf2_mag_gate(_params->mag_innov_gate),
 	_param_ekf2_decl_type(_params->mag_declination_source),
